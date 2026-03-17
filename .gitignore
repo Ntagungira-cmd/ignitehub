@@ -35,3 +35,5 @@ postgres-data/
 
 # TypeScript
 *.tsbuildinfo
+
+.env.client_secret.json
