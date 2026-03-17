@@ -14,16 +14,11 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 
 @Module({
   imports: [
-    // ── Config (env vars) ─────────────────────────────────────────────────────
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-
-    // ── Cron / Scheduling ────────────────────────────────────────────────────
     ScheduleModule.forRoot(),
-
-    // ── Database (TypeORM + PostgreSQL) ──────────────────────────────────────
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,7 +29,6 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
         username: config.get<string>('DB_USER', 'ignitehub'),
         password: config.get<string>('DB_PASSWORD', 'ignitehub_secret'),
         database: config.get<string>('DB_NAME', 'ignitehub_db'),
-        // Entities discovered automatically from all modules
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         synchronize: config.get<string>('NODE_ENV') !== 'production',
