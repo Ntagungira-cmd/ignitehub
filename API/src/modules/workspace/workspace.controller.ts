@@ -6,6 +6,7 @@ import {
   ParseUUIDPipe,
   Post,
   Patch,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,6 +20,7 @@ import { WorkspaceService } from './workspace.service';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { UpdateColumnDto } from './dto/update-column.dto';
 
 @ApiTags('Workspace')
 @ApiBearerAuth()
@@ -45,6 +47,16 @@ export class WorkspaceController {
     return this.workspaceService.addColumn(workspaceId, dto);
   }
 
+  @Patch('columns/:columnId')
+  @ApiOperation({ summary: 'Update column (title, position)' })
+  @ApiResponse({ status: 200, description: 'Column updated' })
+  updateColumn(
+    @Param('columnId', ParseUUIDPipe) columnId: string,
+    @Body() dto: UpdateColumnDto,
+  ) {
+    return this.workspaceService.updateColumn(columnId, dto);
+  }
+
   @Post('columns/:columnId/cards')
   @ApiOperation({ summary: 'Create a new task card in a column' })
   @ApiResponse({ status: 201, description: 'Card created' })
@@ -63,5 +75,12 @@ export class WorkspaceController {
     @Body() dto: UpdateCardDto,
   ) {
     return this.workspaceService.updateCard(cardId, dto);
+  }
+
+  @Delete('cards/:cardId')
+  @ApiOperation({ summary: 'Delete a card' })
+  @ApiResponse({ status: 200, description: 'Card deleted' })
+  deleteCard(@Param('cardId', ParseUUIDPipe) cardId: string) {
+    return this.workspaceService.deleteCard(cardId);
   }
 }

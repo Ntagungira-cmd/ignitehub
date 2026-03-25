@@ -50,6 +50,9 @@ export class KanbanCard {
   @JoinColumn({ name: 'assignee_id' })
   assignee: User;
 
+  @Column({ type: 'int', default: 0 })
+  position: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

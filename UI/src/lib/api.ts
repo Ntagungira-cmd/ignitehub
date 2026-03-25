@@ -133,6 +133,7 @@ export interface KanbanCard {
   columnId: string;
   assigneeId?: string;
   assignee?: User;
+  position: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -228,8 +229,12 @@ export const workspaceApi = {
     api.get<Workspace>(`/workspaces/project/${projectId}`).then((r) => r.data),
   addColumn: (workspaceId: string, data: { title: string; position?: number }) =>
     api.post<KanbanColumn>(`/workspaces/${workspaceId}/columns`, data).then((r) => r.data),
-  addCard: (columnId: string, data: { title: string; description?: string; priority?: CardPriority; dueDate?: string; assigneeId?: string }) =>
+  updateColumn: (columnId: string, data: Partial<{ title: string; position: number }>) =>
+    api.patch<KanbanColumn>(`/workspaces/columns/${columnId}`, data).then((r) => r.data),
+  addCard: (columnId: string, data: { title: string; description?: string; priority?: CardPriority; dueDate?: string; assigneeId?: string; position?: number }) =>
     api.post<KanbanCard>(`/workspaces/columns/${columnId}/cards`, data).then((r) => r.data),
-  updateCard: (cardId: string, data: Partial<{ title: string; description: string; priority: CardPriority; dueDate: string; columnId: string; assigneeId: string }>) =>
+  updateCard: (cardId: string, data: Partial<{ title: string; description: string; priority: CardPriority; dueDate: string; columnId: string; assigneeId: string; position: number }>) =>
     api.patch<KanbanCard>(`/workspaces/cards/${cardId}`, data).then((r) => r.data),
+  deleteCard: (cardId: string) =>
+    api.delete(`/workspaces/cards/${cardId}`).then((r) => r.data),
 };

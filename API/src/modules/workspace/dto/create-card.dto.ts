@@ -2,9 +2,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsDateString,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
   IsUUID,
+  Min,
 } from 'class-validator';
 import { CardPriority } from '../kanban-card.entity';
 
@@ -32,4 +34,10 @@ export class CreateCardDto {
   @IsOptional()
   @IsUUID()
   assigneeId?: string;
+
+  @ApiPropertyOptional({ example: 0, minimum: 0 })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  position?: number;
 }

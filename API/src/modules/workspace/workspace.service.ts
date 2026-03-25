@@ -7,6 +7,7 @@ import { KanbanCard } from './kanban-card.entity';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { UpdateColumnDto } from './dto/update-column.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -44,7 +45,12 @@ export class WorkspaceService {
     const workspace = await this.workspaceRepo.findOne({
       where: { projectId },
       relations: ['columns', 'columns.cards', 'columns.cards.assignee'],
-      order: { columns: { position: 'ASC' } },
+      order: {
+        columns: {
+          position: 'ASC',
+          cards: { position: 'ASC' },
+        },
+      },
     });
     if (!workspace) {
       throw new NotFoundException(
@@ -81,12 +87,20 @@ export class WorkspaceService {
   }
 
   async addCard(columnId: string, dto: CreateCardDto): Promise<KanbanCard> {
-    const column = await this.columnRepo.findOne({ where: { id: columnId } });
+    const column = await this.columnRepo.findOne({
+      where: { id: columnId },
+      relations: ['cards'],
+    });
     if (!column) {
       throw new NotFoundException(`Column ${columnId} not found`);
     }
 
-    const card = this.cardRepo.create({ ...dto, columnId });
+    const maxPosition = column.cards?.length ?? 0;
+    const card = this.cardRepo.create({
+      ...dto,
+      columnId,
+      position: dto.position ?? maxPosition,
+    });
     return this.cardRepo.save(card);
   }
 
@@ -107,5 +121,26 @@ export class WorkspaceService {
 
     Object.assign(card, dto);
     return this.cardRepo.save(card);
+  }
+
+  async updateColumn(
+    columnId: string,
+    dto: UpdateColumnDto,
+  ): Promise<KanbanColumn> {
+    const column = await this.columnRepo.findOne({ where: { id: columnId } });
+    if (!column) {
+      throw new NotFoundException(`Column ${columnId} not found`);
+    }
+
+    Object.assign(column, dto);
+    return this.columnRepo.save(column);
+  }
+
+  async deleteCard(cardId: string): Promise<void> {
+    const card = await this.cardRepo.findOne({ where: { id: cardId } });
+    if (!card) {
+      throw new NotFoundException(`Card ${cardId} not found`);
+    }
+    await this.cardRepo.remove(card);
   }
 }
