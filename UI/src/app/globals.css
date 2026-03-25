@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  /* Pastel-Plus Indigo Brand */
+  --color-brand-50:  #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1; /* Indigo-500 */
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+}
+
+@layer base {
+  :root {
+    --bg: #FCFCFD; /* Milk / Off-White */
+    --surface: #ffffff;
+    --surface-2: #F1F5F9; /* Slate-100 */
+    --border: #E2E8F0; /* Slate-200 */
+    --text-primary: #1A1A1A; /* Charcoal */
+    --text-muted: #64748B; /* Slate-500 */
+    
+    /* Soft sidebar for light mode */
+    --sidebar-bg: #F8F9FA;
+    --sidebar-text: #334155;
+  }
+
+  /* Force light mode variables across the board to satisfy the strict Light UI constraints */
+  .dark {
+    --bg: #FCFCFD;
+    --surface: #ffffff;
+    --surface-2: #F1F5F9;
+    --border: #E2E8F0;
+    --text-primary: #1A1A1A;
+    --text-muted: #64748B;
+    --sidebar-bg: #F8F9FA;
+    --sidebar-text: #334155;
+  }
+
+  body {
+    /* Slightly increased font weight via font-medium for better readability on light DOM */
+    @apply bg-[var(--bg)] text-[var(--text-primary)] font-medium antialiased min-h-screen selection:bg-brand-500/20 selection:text-brand-900;
+  }
+}
+
+/* Scrollbar styling for a polished UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+}
+
+/* Custom Utilities for elegant light components */
+@layer utilities {
+  .glass-card {
+    /* Subtle glassmorphism with light transparent white overlays and soft box shadow */
+    @apply bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-white/50 transition-all duration-300 hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] hover:border-slate-300/60;
+  }
+}
