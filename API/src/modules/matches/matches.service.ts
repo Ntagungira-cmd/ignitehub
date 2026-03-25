@@ -44,7 +44,13 @@ export class MatchesService {
       where: { role: UserRole.MENTOR, isActive: true },
     });
 
+    const existingMatches = await this.matchRepo.find({
+      where: { studentId },
+    });
+    const matchedUserIds = new Set(existingMatches.map((m) => m.matchedUserId));
+
     const recommendations: MatchRecommendation[] = mentors
+      .filter((m) => !matchedUserIds.has(m.id) && m.id !== studentId)
       .map((mentor) => {
         const mentorSkills = mentor.skills ?? [];
         const { score, intersection } = this.jaccard(
@@ -93,6 +99,7 @@ export class MatchesService {
       status: MatchStatus.PENDING,
       score,
       matchingTags,
+      projectId: dto.projectId,
     });
     const saved = await this.matchRepo.save(match);
 

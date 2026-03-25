@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Project } from '../projects/project.entity';
 
 export enum MatchType {
   MENTOR = 'mentor',
@@ -55,6 +56,14 @@ export class Match {
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'matched_user_id' })
   matchedUser: User;
+
+  // ── Project (optional) ──────────────────────────────────────────────────────
+  @Column({ name: 'project_id', nullable: true })
+  projectId: string;
+
+  @ManyToOne(() => Project, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'project_id' })
+  project: Project;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

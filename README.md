@@ -30,50 +30,68 @@ IgniteHub/
 ## Getting Started
 
 ### Prerequisites
-- Node.js 20+
-- Docker & Docker Compose
-- NestJS CLI (`npm install -g @nestjs/cli`)
+- **Node.js**: v20 or later
+- **Docker & Docker Compose**: For database and API services
+- **npm**: v10 or later
 
-### 1. Clone the repository
+### 1. Initial Setup
+Clone the repository and install UI dependencies:
 ```bash
 git clone <repo-url>
 cd IgniteHub
+cd UI && npm install && cd ..
 ```
 
-### 2. Configure environment variables
+### 2. Configure API Environment
+The backend requires an `.env` file. A template is provided:
 ```bash
 cp API/.env.example API/.env
-# Edit API/.env with your values
+# Update API/.env with your Google OAuth credentials if testing calendar features
 ```
 
-### 3. Start the backend + database
+### 3. Start Backend Services (Docker)
+This will spin up the PostgreSQL database and the NestJS API:
 ```bash
-docker compose up -d
+docker compose up --build -d
+```
+The API will be available at `http://localhost:3001/api`.
+
+### 4. Seed the Database (Required for Test Data)
+Populate the database with realistic users, projects, and Kanban boards:
+```bash
+docker compose exec api npm run seed
 ```
 
-### 4. Start the frontend
+### 5. Start the Frontend
+In a new terminal, run the development server:
 ```bash
 cd UI
-npm install
 npm run dev
 ```
+The UI will be available at `http://localhost:3000`.
 
-The UI will be available at `http://localhost:3000` and the API at `http://localhost:3001`.
+## Test Credentials
+The database seeder (`npm run seed`) creates the following accounts (password: `Password123!`):
+
+| Role | Email | Name |
+|---|---|---|
+| **Student** | `ntagungiraali@gmail.com` | Ali Ntagungira |
+| **Mentor** | `a.ntagungira@irembo.com` | Ali Mentor |
+| **Admin** | `r.ntagungir@alustudent.com` | Ali Admin |
 
 ## Core Modules
 
-- **User Management** — Role-based registration (Student, Mentor, Admin)
-- **Matching Engine** — AI-driven Student↔Mentor and Student↔Collaborator pairing
-- **Innovation Workspace** — Kanban-style project tracking boards
-- **Resource Repository** — Searchable library of templates, workshops, and past inventions
-- **Mentorship Sessions** — Google Calendar-integrated scheduling with email alerts
+- **User Management** — Role-based accounts (Student, Mentor, Admin)
+- **Matching Engine** — Project-specific connectivity (Mentor vs. Collaborator)
+- **Innovation Workspace** — Kanban-style boards with per-project tracking
+- **Mentorship Sessions** — Google Calendar & Meet integration for scheduling
+- **Resource Repository** — Shared templates and workshop materials
 
 ## Development
 
-- API docs (Swagger): `http://localhost:3001/api`
-- Sprints follow 2-week Agile/Scrum cycles
-- See `ignitehub_dev_plan.md` for the full roadmap
-
+- **API Documentation**: `http://localhost:3001/api`
+- **Database Logs**: `docker compose logs -f db`
+- **Rebuilding API**: `docker compose up --build -d api`
 
 ## License
 

@@ -84,6 +84,8 @@ export interface Match {
   student?: User;
   matchedUserId: string;
   matchedUser?: User;
+  projectId?: string;
+  project?: Project;
   createdAt: string;
 }
 
@@ -198,7 +200,7 @@ export const projectsApi = {
 export const matchesApi = {
   recommendations: () => api.get<MatchRecommendation[]>('/matches/recommendations').then((r) => r.data),
   myMatches: () => api.get<Match[]>('/matches').then((r) => r.data),
-  request: (userId: string, data: { type: MatchType }) =>
+  request: (userId: string, data: { type: MatchType; projectId?: string }) =>
     api.post<Match>(`/matches/request/${userId}`, data).then((r) => r.data),
   updateStatus: (matchId: string, data: { status: 'accepted' | 'rejected' }) =>
     api.patch<Match>(`/matches/${matchId}/status`, data).then((r) => r.data),

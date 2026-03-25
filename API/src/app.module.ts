@@ -11,6 +11,7 @@ import { MatchesModule } from './modules/matches/matches.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
 import { ResourcesModule } from './modules/resources/resources.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { SeedsModule } from './modules/seeds/seeds.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     SessionsModule,
     ResourcesModule,
     NotificationsModule,
+    SeedsModule,
   ],
 })
 export class AppModule {}

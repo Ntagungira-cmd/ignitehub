@@ -1,16 +1,23 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { matchesApi, type MatchRecommendation } from '@/lib/api';
+import { useState } from 'react';
+import { matchesApi, projectsApi, type MatchRecommendation, type Project } from '@/lib/api';
 
-function RecommendationCard({ rec }: { rec: MatchRecommendation }) {
+function RecommendationCard({ rec, projects }: { rec: MatchRecommendation, projects: Project[] }) {
+  const [matchType, setMatchType] = useState<'mentor' | 'collaborator'>('mentor');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(projects[0]?.id || '');
+
   const qc = useQueryClient();
   const { mentor, score, matchingTags } = rec;
   const scorePercent = Math.round(score * 100);
 
   const { mutate: sendRequest, isPending, isSuccess } = useMutation({
-    mutationFn: () => matchesApi.request(mentor.id, { type: 'mentor' }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['matches'] }),
+    mutationFn: () => matchesApi.request(mentor.id, { 
+      type: matchType,
+      projectId: selectedProjectId || undefined,
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['recommendations'] }),
   });
 
   return (
@@ -68,6 +75,36 @@ function RecommendationCard({ rec }: { rec: MatchRecommendation }) {
               </span>
             )}
           </div>
+          
+          <div className="mt-5 flex flex-wrap items-center gap-4">
+            <div className="flex bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)]">
+              <button 
+                onClick={() => setMatchType('mentor')}
+                className={`px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all ${matchType === 'mentor' ? 'bg-brand-500 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+              >
+                MENTOR
+              </button>
+              <button 
+                onClick={() => setMatchType('collaborator')}
+                className={`px-3 py-1.5 rounded-lg text-[12px] font-bold transition-all ${matchType === 'collaborator' ? 'bg-brand-500 text-white shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+              >
+                COLLABORATOR
+              </button>
+            </div>
+
+            {projects.length > 0 && (
+              <select 
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                className="bg-[var(--surface-2)] border border-[var(--border)] rounded-xl px-3 py-1.5 text-[12px] font-semibold text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-brand-500/20 shadow-sm"
+              >
+                {projects.map(p => (
+                  <option key={p.id} value={p.id}>{p.title}</option>
+                ))}
+                <option value="">General (No Project)</option>
+              </select>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 sm:mt-0 shrink-0 flex flex-row sm:flex-col justify-end">
@@ -96,6 +133,11 @@ export default function RecommendationsPage() {
     queryFn: matchesApi.recommendations,
   });
 
+  const { data: projects } = useQuery({
+    queryKey: ['my-projects'],
+    queryFn: () => projectsApi.list({ limit: 100 }),
+  });
+
   return (
     <div className="max-w-4xl">
       <div className="mb-8 md:mb-10">
@@ -119,7 +161,7 @@ export default function RecommendationsPage() {
       ) : (
         <div className="flex flex-col gap-5">
           {(recommendations ?? []).map((r) => (
-            <RecommendationCard key={r.mentor.id} rec={r} />
+            <RecommendationCard key={r.mentor.id} rec={r} projects={projects ?? []} />
           ))}
         </div>
       )}
