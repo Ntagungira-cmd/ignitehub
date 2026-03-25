@@ -64,7 +64,16 @@ export class GoogleCalendarService {
 
       const response = await calendar.events.insert({
         calendarId: 'primary',
-        requestBody: event,
+        requestBody: {
+          ...event,
+          conferenceData: {
+            createRequest: {
+              requestId: Math.random().toString(36).substring(7),
+              conferenceSolutionKey: { type: 'hangoutsMeet' },
+            },
+          },
+        },
+        conferenceDataVersion: 1,
         sendUpdates: 'all',
       });
  
