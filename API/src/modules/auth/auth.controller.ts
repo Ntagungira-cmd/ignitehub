@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,7 +28,35 @@ import { User } from '../users/user.entity';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly config: ConfigService,
+  ) {}
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Redirect to Google OAuth2 login' })
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  googleLogin() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Google OAuth2 callback handler' })
+  async googleLoginCallback(@Req() req: Request, @Res() res: Response) {
+    const user = req.user as any;
+    const authResult = await this.authService.validateGoogleUser(user);
+    const tokenResponse = this.authService.login(authResult);
+
+    // Redirect to frontend with token
+    // In a real app, you might use a more secure way to pass the token, 
+    // like a secure cookie or a short-lived session.
+    const frontendUrl = this.config.get('CORS_ORIGIN', 'http://localhost:3000');
+    const redirectUrl = new URL(`${frontendUrl}/auth/callback`);
+    redirectUrl.searchParams.set('token', tokenResponse.accessToken);
+    redirectUrl.searchParams.set('user', JSON.stringify(tokenResponse.user));
+
+    return res.redirect(redirectUrl.toString());
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user account' })

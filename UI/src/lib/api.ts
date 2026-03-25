@@ -40,6 +40,9 @@ export interface User {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  googleId?: string;
+  googleRefreshToken?: string;
+  googleTokenExpiresAt?: string;
 }
 
 export interface AuthResponse {
@@ -97,6 +100,7 @@ export interface Session {
   scheduledAt: string;
   durationMinutes: number;
   googleCalendarEventId?: string;
+  googleCalendarEventUrl?: string;
   status: SessionStatus;
   notes?: string;
   mentorId: string;

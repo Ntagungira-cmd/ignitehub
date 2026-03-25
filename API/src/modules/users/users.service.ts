@@ -43,6 +43,12 @@ export class UsersService {
     return this.usersRepo.save(user);
   }
 
+  async updateGoogleInfo(userId: string, data: Partial<User>): Promise<User> {
+    const user = await this.findById(userId);
+    Object.assign(user, data);
+    return this.usersRepo.save(user);
+  }
+
   async findAll(
     query: QueryUsersDto,
   ): Promise<{ data: User[]; total: number; page: number; limit: number }> {

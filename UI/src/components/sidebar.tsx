@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 
 const navItems = (role: string) => {
@@ -40,6 +40,7 @@ function initials(name: string) {
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuthStore();
   const items = navItems(user?.role ?? '');
 
@@ -89,7 +90,10 @@ export function Sidebar() {
         <button 
           className="p-1.5 rounded-lg text-[var(--sidebar-text)]/60 hover:text-[var(--sidebar-text)] hover:bg-slate-200/50 transition-colors"
           title="Logout" 
-          onClick={logout}
+          onClick={() => {
+            logout();
+            router.push('/login');
+          }}
         >
           <span>↩</span>
         </button>

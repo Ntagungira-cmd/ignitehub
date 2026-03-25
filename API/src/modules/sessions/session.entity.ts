@@ -27,8 +27,11 @@ export class MentorshipSession {
   @Column({ name: 'duration_minutes', type: 'int', default: 60 })
   durationMinutes: number;
 
-  @Column({ name: 'google_calendar_event_id', nullable: true })
+  @Column({ name: 'google_calendar_event_id', type: 'text', nullable: true })
   googleCalendarEventId: string;
+
+  @Column({ name: 'google_calendar_event_url', type: 'text', nullable: true })
+  googleCalendarEventUrl: string | null;
 
   @Column({ type: 'enum', enum: SessionStatus, default: SessionStatus.PENDING })
   status: SessionStatus;

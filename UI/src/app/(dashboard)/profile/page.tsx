@@ -153,6 +153,53 @@ export default function ProfilePage() {
           </button>
         </form>
       </div>
+
+      {/* Google Integration */}
+      <div className="glass-card p-6 md:p-8 rounded-[24px] mt-6 border border-brand-500/10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-brand-500/10 flex items-center justify-center text-xl shadow-inner border border-brand-500/20">📅</div>
+          <div>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Google Integration</h2>
+            <p className="text-[13px] text-[var(--text-muted)]">Connect your calendar to sync mentorship sessions.</p>
+          </div>
+        </div>
+
+        <div className="bg-[var(--surface-2)] border border-[var(--border)] rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-3 h-3 rounded-full ${u?.googleRefreshToken ? 'bg-green-500' : 'bg-red-400'} shadow-sm animate-pulse`} />
+            <div>
+              <div className="text-[15px] font-bold text-[var(--text-primary)]">
+                {u?.googleRefreshToken ? 'Calendar Connected' : 'Calendar Not Connected'}
+              </div>
+              <p className="text-[13px] text-[var(--text-muted)]">
+                {u?.googleRefreshToken 
+                  ? 'Your mentorship sessions will be automatically synced to Google Calendar.' 
+                  : 'Grant permission to automatically add sessions to your calendar.'}
+              </p>
+            </div>
+          </div>
+          
+          <button
+            type="button"
+            onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1'}/auth/google`}
+            className={`px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all active:scale-[0.98] ${
+              u?.googleRefreshToken
+                ? 'bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--surface-3)]'
+                : 'bg-brand-500 text-white shadow-lg shadow-brand-500/20 hover:bg-brand-600'
+            }`}
+          >
+            {u?.googleRefreshToken ? 'Reconnect / Sync' : 'Connect Google Calendar'}
+          </button>
+        </div>
+        
+        {u?.googleRefreshToken && (
+          <div className="mt-4 px-4 py-2 bg-green-50/50 border border-green-200/50 rounded-lg">
+            <p className="text-[12px] text-green-700 font-medium">
+              ✨ Syncing to: <span className="font-bold">{u.email}</span>
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

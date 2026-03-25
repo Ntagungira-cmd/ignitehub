@@ -43,6 +43,18 @@ function SessionCard({ session }: { session: Session }) {
           {isMentor ? `Student: ${session.student?.fullName ?? 'Unknown'}` : `Mentor: ${session.mentor?.fullName ?? 'Unknown'}`}
         </div>
         
+        {session.status === 'confirmed' && session.googleCalendarEventUrl && (
+          <a 
+            href={session.googleCalendarEventUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-600 hover:text-brand-700 transition-colors bg-brand-50/50 px-3 py-1 rounded-lg border border-brand-100 w-fit"
+          >
+            <span className="text-sm">📅</span>
+            <span>Open in Google Calendar</span>
+          </a>
+        )}
+        
         {session.notes && (
           <div className="mt-3.5 border-l-2 border-brand-500/30 pl-3.5 py-1">
             <p className="text-[13px] text-[var(--text-muted)] italic leading-relaxed">

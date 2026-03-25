@@ -13,35 +13,40 @@ export interface CalendarEventInput {
 @Injectable()
 export class GoogleCalendarService {
   private readonly logger = new Logger(GoogleCalendarService.name);
-  private calendar: calendar_v3.Calendar;
+  private readonly clientId: string | undefined;
+  private readonly clientSecret: string | undefined;
+  private readonly redirectUri: string;
 
   constructor(private readonly config: ConfigService) {
-    const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
-    const clientSecret = this.config.get<string>('GOOGLE_CLIENT_SECRET');
-    const redirectUri = this.config.get<string>(
+    this.clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
+    this.clientSecret = this.config.get<string>('GOOGLE_CLIENT_SECRET');
+    this.redirectUri = this.config.get<string>(
       'GOOGLE_REDIRECT_URI',
       'http://localhost:3001/api/v1/auth/google/callback',
     );
-
-    if (clientId && clientSecret) {
-      const auth = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-      this.calendar = google.calendar({ version: 'v3', auth });
-    } else {
-      this.logger.warn(
-        'Google Calendar credentials not configured — calendar events will be skipped',
-      );
-    }
   }
 
-  async createEvent(input: CalendarEventInput): Promise<string | null> {
-    if (!this.calendar) {
-      this.logger.warn(
-        'Google Calendar not configured; skipping event creation',
-      );
-      return null;
+  private getAuthClient(refreshToken: string) {
+    if (!this.clientId || !this.clientSecret) {
+      throw new Error('Google Calendar credentials not configured');
     }
+    const auth = new google.auth.OAuth2(
+      this.clientId,
+      this.clientSecret,
+      this.redirectUri,
+    );
+    auth.setCredentials({ refresh_token: refreshToken });
+    return auth;
+  }
 
+  async createEvent(
+    refreshToken: string,
+    input: CalendarEventInput,
+  ): Promise<{ id: string; url: string | null } | null> {
     try {
+      const auth = this.getAuthClient(refreshToken);
+      const calendar = google.calendar({ version: 'v3', auth });
+
       const event: calendar_v3.Schema$Event = {
         summary: input.summary,
         description: input.description,
@@ -57,23 +62,30 @@ export class GoogleCalendarService {
         },
       };
 
-      const response = await this.calendar.events.insert({
+      const response = await calendar.events.insert({
         calendarId: 'primary',
         requestBody: event,
         sendUpdates: 'all',
       });
-
-      return response.data.id ?? null;
+ 
+      if (!response.data.id) return null;
+ 
+      return {
+        id: response.data.id,
+        url: response.data.htmlLink ?? null,
+      };
     } catch (err) {
       this.logger.error('Failed to create Google Calendar event', err);
       return null;
     }
   }
 
-  async deleteEvent(eventId: string): Promise<void> {
-    if (!this.calendar) return;
+  async deleteEvent(refreshToken: string, eventId: string): Promise<void> {
     try {
-      await this.calendar.events.delete({
+      const auth = this.getAuthClient(refreshToken);
+      const calendar = google.calendar({ version: 'v3', auth });
+
+      await calendar.events.delete({
         calendarId: 'primary',
         eventId,
         sendUpdates: 'all',

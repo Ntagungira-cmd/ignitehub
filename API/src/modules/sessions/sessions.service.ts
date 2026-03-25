@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,6 +15,8 @@ import { CreateSessionDto } from './dto/create-session.dto';
 
 @Injectable()
 export class SessionsService {
+  private readonly logger = new Logger(SessionsService.name);
+
   constructor(
     @InjectRepository(MentorshipSession)
     private readonly sessionRepo: Repository<MentorshipSession>,
@@ -105,19 +108,32 @@ export class SessionsService {
       session.student?.email,
     ].filter((e): e is string => Boolean(e));
 
-    const calendarEventId = await this.googleCalendarService.createEvent({
-      summary: 'IgniteHub Mentorship Session',
-      description: session.notes ?? undefined,
-      startTime: session.scheduledAt,
-      endTime,
-      attendeeEmails,
-    });
-
-    if (calendarEventId) {
-      session.googleCalendarEventId = calendarEventId;
-    }
+    // MOVED LOGIC: Calendar sync is now handled after saved to ensure ID etc.
+    // We will call googleCalendarService with the mentor's refreshToken.
 
     const saved = await this.sessionRepo.save(session);
+
+    // If we have a mentor with a Google refresh token, try to sink to their calendar
+    if (session.mentor?.googleRefreshToken) {
+      await this.googleCalendarService
+        .createEvent(session.mentor.googleRefreshToken, {
+          summary: 'IgniteHub Mentorship Session',
+          description: session.notes ?? undefined,
+          startTime: session.scheduledAt,
+          endTime,
+          attendeeEmails,
+        })
+        .then((result) => {
+          if (result) {
+            saved.googleCalendarEventId = result.id;
+            saved.googleCalendarEventUrl = result.url;
+            return this.sessionRepo.save(saved);
+          }
+        })
+        .catch((err) =>
+          this.logger.error('Failed to sync to mentor calendar', err),
+        );
+    }
 
     for (const email of attendeeEmails) {
       await this.notificationsService
@@ -149,9 +165,9 @@ export class SessionsService {
       );
     }
 
-    if (session.googleCalendarEventId) {
+    if (session.googleCalendarEventId && session.mentor?.googleRefreshToken) {
       await this.googleCalendarService
-        .deleteEvent(session.googleCalendarEventId)
+        .deleteEvent(session.mentor.googleRefreshToken, session.googleCalendarEventId)
         .catch(() => null);
     }
 

@@ -38,6 +38,43 @@ export class AuthService {
     return this.usersService.findById(userId);
   }
 
+  async validateGoogleUser(googleUser: {
+    googleId: string;
+    email: string;
+    fullName: string;
+    avatarUrl?: string;
+    accessToken: string;
+    refreshToken?: string;
+    expiresIn: number;
+  }): Promise<User> {
+    const user = await this.usersService.findByEmail(googleUser.email);
+
+    const tokenExpiresAt = new Date(Date.now() + googleUser.expiresIn * 1000);
+
+    const googleFields = {
+      googleId: googleUser.googleId,
+      googleAccessToken: googleUser.accessToken,
+      ...(googleUser.refreshToken && {
+        googleRefreshToken: googleUser.refreshToken,
+      }),
+      googleTokenExpiresAt: tokenExpiresAt,
+      avatarUrl: googleUser.avatarUrl,
+    };
+
+    if (user) {
+      // Update existing user with Google info
+      return this.usersService.updateGoogleInfo(user.id, googleFields);
+    } else {
+      // Create new user
+      return this.usersService.create({
+        email: googleUser.email,
+        fullName: googleUser.fullName,
+        passwordHash: 'GOOGLE_OAUTH', // Dummy password
+        ...googleFields,
+      });
+    }
+  }
+
   private buildTokenResponse(user: User): AuthTokenResponse {
     const payload: JwtPayload = {
       sub: user.id,

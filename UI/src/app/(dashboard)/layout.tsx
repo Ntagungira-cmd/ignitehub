@@ -7,16 +7,15 @@ import { Sidebar } from '@/components/sidebar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, token } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (!isAuthenticated()) {
       router.replace('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, token]);
 
   // During SSR and initial hydration both server and client render null → no mismatch
   if (!mounted || !isAuthenticated()) return null;

@@ -46,6 +46,22 @@ export class User {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({ name: 'google_id', unique: true, nullable: true })
+  googleId: string;
+
+  @Column({ name: 'google_access_token', type: 'text', nullable: true })
+  googleAccessToken: string;
+
+  @Column({ name: 'google_refresh_token', type: 'text', nullable: true })
+  googleRefreshToken: string;
+
+  @Column({
+    name: 'google_token_expires_at',
+    type: 'timestamptz',
+    nullable: true,
+  })
+  googleTokenExpiresAt: Date;
+
   // ── Relations ───────────────────────────────────────────────────────────────
   @OneToMany(() => Project, (project) => project.owner)
   ownedProjects: Project[];
