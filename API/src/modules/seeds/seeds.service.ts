@@ -66,11 +66,13 @@ export class SeedsService {
         title: 'Smart Agriculture Monitoring System',
         abstract: 'An IoT-based system to monitor soil moisture, temperature, and humidity for optimized irrigation cycles and crop health management.',
         tags: ['IoT', 'React', 'Node.js', 'Hardware'],
+        projectUrl: 'https://github.com/ali-ntagungira/smart-agri-monitor',
       },
       {
         title: 'AI-Powered Resume Screener',
         abstract: 'Automating the recruitment process using NLP to rank and filter resumes based on job descriptions and core competencies.',
         tags: ['AI', 'Python', 'NLP', 'Data Science'],
+        projectUrl: 'https://github.com/ali-ntagungira/ai-resume-screener',
       }
     ];
 

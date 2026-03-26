@@ -31,6 +31,9 @@ export class Project {
   @Column({ type: 'text' })
   abstract: string;
 
+  @Column({ name: 'project_url', nullable: true })
+  projectUrl: string;
+
   @Column({ type: 'simple-array', nullable: true })
   tags: string[];
 

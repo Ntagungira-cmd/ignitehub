@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, IsUrl } from 'class-validator';
 import { ProjectStatus } from '../project.entity';
 
 export class CreateProjectDto {
@@ -18,6 +18,11 @@ export class CreateProjectDto {
   @IsArray()
   @IsString({ each: true })
   tags?: string[];
+
+  @ApiPropertyOptional({ example: 'https://github.com/ali/edumatch-ai' })
+  @IsOptional()
+  @IsUrl()
+  projectUrl?: string;
 
   @ApiPropertyOptional({ enum: ProjectStatus, default: ProjectStatus.DRAFT })
   @IsOptional()

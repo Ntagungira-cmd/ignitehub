@@ -59,7 +59,8 @@ The API will be available at `http://localhost:3001/api`.
 ### 4. Seed the Database (Required for Test Data)
 Populate the database with realistic users, projects, and Kanban boards:
 ```bash
-docker compose exec api npm run seed
+# Run seeder inside the container (using compiled output)
+docker compose exec api node dist/run-seed.js
 ```
 
 ### 5. Start the Frontend
@@ -71,7 +72,7 @@ npm run dev
 The UI will be available at `http://localhost:3000`.
 
 ## Test Credentials
-The database seeder (`npm run seed`) creates the following accounts (password: `Password123!`):
+The database seeder (`node dist/run-seed.js`) creates the following accounts (password: `Password123!`):
 
 | Role | Email | Name |
 |---|---|---|

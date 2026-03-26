@@ -44,6 +44,18 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Seeding
+
+Populate the database with test data:
+
+```bash
+# Locally (requires ts-node)
+$ npm run seed
+
+# Via Docker (recommended)
+$ docker compose exec api node dist/run-seed.js
+```
+
 ## Run tests
 
 ```bash
