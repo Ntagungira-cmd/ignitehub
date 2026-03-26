@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
+import { Logo } from '@/components/Logo';
 
 const navItems = (role: string) => {
   const base = [
@@ -47,10 +48,7 @@ export function Sidebar() {
   return (
     <aside className="w-full md:w-60 min-h-auto md:min-h-screen shrink-0 bg-[var(--sidebar-bg)] text-[var(--sidebar-text)] flex flex-col p-4 md:p-5 sticky top-0 border-r md:border-r-[var(--border)] border-b md:border-b-transparent border-[var(--border)] z-10">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-2 pb-6 md:pb-8">
-        <span className="text-2xl">🔥</span>
-        <span className="text-lg font-extrabold tracking-tight text-[var(--sidebar-text)]">IgniteHub</span>
-      </div>
+      <Logo className="px-2 pb-6 md:pb-8" />
 
       {/* Nav */}
       <nav className="flex flex-col gap-1 flex-1">

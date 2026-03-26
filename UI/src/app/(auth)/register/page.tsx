@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { authApi, type UserRole } from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { Logo } from '@/components/Logo';
 
 const ROLES: { value: UserRole; label: string; desc: string; emoji: string }[] = [
   { value: 'student', label: 'Student', desc: 'Find mentors, build projects', emoji: '🎓' },
@@ -48,10 +49,7 @@ export default function RegisterPage() {
         <div className="absolute -bottom-24 -right-24 w-56 h-56 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Logo */}
-        <div className="flex items-center gap-2.5 mb-8 relative z-10">
-          <span className="text-3xl filter drop-shadow-sm">🔥</span>
-          <span className="text-xl font-extrabold tracking-tight text-[var(--text-primary)]">IgniteHub</span>
-        </div>
+        <Logo className="mb-8 relative z-10" />
 
         <div className="relative z-10">
           <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1.5">Create an account</h1>
