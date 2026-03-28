@@ -32,7 +32,7 @@ import { SeedsModule } from './modules/seeds/seeds.module';
         database: config.get<string>('DB_NAME', 'ignitehub_db'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
-        synchronize: config.get<string>('NODE_ENV') !== 'production',
+        synchronize: true,
         logging: config.get<string>('DB_LOGGING') === 'true',
       }),
     }),
